@@ -49,16 +49,15 @@ db = SQLAlchemy(app) # For database use
 ## -- id (Integer, Primary Key)
 ## -- text (String, up to 280 chars)
 ## -- user_id (Integer, ID of user posted -- ForeignKey)
-class Tweet(db.Model):
-    __tablename__ = 'tweets'
-    id = db.Column(db.Integer,primary_key=True)
-    text = db.Column(db.String(280))
-    user_id = db.Column(db.Integer)
-    def __repr__(self):
-        return '{} (ID: {})'.format(self.text, self.id)
-
 ## Should have a __repr__ method that returns strings of a format like:
 #### {Tweet text...} (ID: {tweet id})
+class Tweet(db.Model):
+    __tablename__ = 'tweets'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(280))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    def __repr__(self):
+        return '{} (ID: {})'.format(self.text, self.id)
 
 
 # - User
@@ -66,9 +65,16 @@ class Tweet(db.Model):
 ## -- username (String, up to 64 chars, Unique=True)
 ## -- display_name (String, up to 124 chars)
 ## ---- Line to indicate relationship between Tweet and User tables (the 1 user: many tweets relationship)
-
 ## Should have a __repr__ method that returns strings of a format like:
 #### {username} | ID: {id}
+class User(db.Model):
+    __tablename__ 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True)
+    display_name = db.Column(db.String(124))
+    tweets = db.relationship('Tweet', backref='user')
+    def __repr__(self):
+        return '{} | ID: {}'.format(self.username, self.id)
 
 
 ########################
@@ -86,6 +92,14 @@ class Tweet(db.Model):
 # TODO 364: Set up custom validation for this form such that:
 # - the twitter username may NOT start with an "@" symbol (the template will put that in where it should appear)
 # - the display name MUST be at least 2 words (this is a useful technique to practice, even though this is not true of everyone's actual full name!)
+class TwitterEntryForm(FlaskForm):
+    text = StringField('Enter text for the tweet', validators=[Required()])
+    username = StringField('Enter the Twitter username to post the tweet from', validators=[Required()])
+    display_name = StringField('Enter the display name of the Twitter user with the entered username', validators=[Required()])
+    def validate_display_name(self, field):
+        if field.data[0] == '@':
+            raise ValidationError('Your display name was not valid because it began with the @ symbol.')
+
 
 # TODO 364: Make sure to check out the sample application linked in the readme to check if yours is like it!
 
@@ -124,9 +138,9 @@ def internal_server_error(e):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # Initialize the form
-
+    form = TwitterEntryForm()
     # Get the number of Tweets
-
+    
     # If the form was posted to this route,
     ## Get the data from the form
 
