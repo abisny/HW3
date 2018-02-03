@@ -179,7 +179,10 @@ def index():
 
 @app.route('/all_tweets')
 def see_all_tweets():
-    all_tweets = Tweet.query.all()
+    tweets = Tweet.query.all()
+    all_tweets = []
+    for tweet in tweets:
+        all_tweets.append([tweet.text, User.query.filter_by(id=tweet.user_id).first().username])
     return render_template('all_tweets.html', all_tweets=all_tweets)
     # TODO 364: Fill in this view function so that it can successfully render the template all_tweets.html, which is provided.
     # HINT: Careful about what type the templating in all_tweets.html is expecting! It's a list of... not lists, but...
@@ -188,11 +191,29 @@ def see_all_tweets():
 
 @app.route('/all_users')
 def see_all_users():
-    pass # Replace with code
+    users = User.query.all()
+    return render_template('all_users.html', users=users)
     # TODO 364: Fill in this view function so it can successfully render the template all_users.html, which is provided.
 
 # TODO 364
 # Create another route (no scaffolding provided) at /longest_tweet with a view function get_longest_tweet (see details below for what it should do)
+@app.route('/longest_tweet')
+def get_longest_tweet():
+    all_tweets = Tweet.query.all()
+    len_longest_tweet = 0
+    longest_tweet = Tweet.query.first()
+    for tweet in all_tweets:
+        length = 0
+        for char in tweet.text:
+            if char != ' ':
+                length += 1
+        if length > len_longest_tweet:
+            len_longest_tweet = length
+            longest_tweet = tweet
+            user = User.query.filter_by(id=tweet.user_id).first()
+    return render_template('longest_tweet.html', longest_tweet=longest_tweet, user=user)
+
+
 # TODO 364
 # Create a template to accompany it called longest_tweet.html that extends from base.html.
 
