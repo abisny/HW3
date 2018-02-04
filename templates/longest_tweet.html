@@ -3,7 +3,7 @@
 {% block content %}
 <p>The tweet text with the most non-whitespace characters is:</p>
 {% if longest_tweet %}
-  <p><i>{{ longest_tweet.text }}</i>, posted by <strong>@{{ user.username }}</strong>({{user.display_name}})</p>
+  <p><i>{{ longest_tweet.text }}</i>, posted by <strong>@{{ user.username }}</strong> ({{user.display_name}})</p>
 {% endif %}
 
 {% if not longest_tweet %}
