@@ -170,6 +170,7 @@ def index():
         tweet = Tweet(text=form.text.data, user_id=user.id)
         db.session.add(tweet)
         db.session.commit()
+        flash('The Tweet has been successfully added.')
 
     # PROVIDED: If the form did NOT validate / was not submitted
     errors = [v for v in form.errors.values()]
